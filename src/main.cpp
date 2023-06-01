@@ -8,6 +8,5 @@ int main() {
     for (const auto &i : vtNum) 
     { 
         std::cout << i << std::endl;
-        std::cout<< "hell"<<std::endl; 
     }
 }
