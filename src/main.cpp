@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <iostream>
+#include <locale>
 #include <utility>
 #include <vector>
 int main() {
@@ -8,5 +9,6 @@ int main() {
     for (const auto &i : vtNum) 
     { 
         std::cout << i << std::endl;
+        std::cout<< "hello" << std::endl;
     }
 }
