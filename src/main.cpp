@@ -10,6 +10,5 @@ int main() {
     { 
         std::cout << i << std::endl;
         std::cout<< "hello" << std::endl;
-        std::cout<<"world"<<std::endl;
     }
 }
