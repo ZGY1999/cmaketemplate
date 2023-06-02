@@ -7,6 +7,7 @@
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
+#include <vector>
 using namespace std;
 
 shared_ptr<int> getIntSharedMemory(int num)
@@ -53,6 +54,40 @@ void TestSmartPointerWrongWayToUse()
     cout<<sp1.use_count()<<endl;
     cout<<sp2.use_count()<<endl;
 }
-int main() {
+
+
+void HowToGetSharedPtrFromThis()
+{
+    class Person : public std::enable_shared_from_this<Person> {
+      public:
+        std::string name;
+        Person(std::string n) : name(n) {}
+        ~Person() {}
+
+      public:
+        void setParentsAndTheirKids(
+            std::shared_ptr<Person> m = nullptr,
+            std::shared_ptr<Person> f = nullptr) {
+            mother = m;
+            father = f;
+            // this指针是一个普通指针，不是智能指针，所以不能直接赋值给shared_ptr
+            //需要得到this指针的智能指针 可以使用enable_shared_from_this
+            if (m != nullptr) { father->kids.push_back(shared_from_this()); }
+            if (f != nullptr) { mother->kids.push_back(shared_from_this()); }
+        }
+
+      private:
+        std::shared_ptr<Person> mother;
+        std::shared_ptr<Person> father;
+        std::vector<std::shared_ptr<Person>> kids;
+    };
+    shared_ptr<Person> mom(new Person("mom"));
+    shared_ptr<Person> dad(new Person("dad"));
+    shared_ptr<Person> kid(new Person("kid"));
+    kid->setParentsAndTheirKids(mom, dad);
+    cout << typeid(*kid).name() << endl;
+}
+int main() 
+{
 
 }
