@@ -1,3 +1,4 @@
+#include <exception>
 #include <iostream>
 #include <type_traits>
 #include <unistd.h> // for ftruncate
@@ -62,7 +63,7 @@ void HowToGetSharedPtrFromThis()
       public:
         std::string name;
         Person(std::string n) : name(n) {}
-        ~Person() {}
+        ~Person() {cout << "delete " << name << endl;}
 
       public:
         void setParentsAndTheirKids(
@@ -71,9 +72,12 @@ void HowToGetSharedPtrFromThis()
             mother = m;
             father = f;
             // this指针是一个普通指针，不是智能指针，所以不能直接赋值给shared_ptr
-            //需要得到this指针的智能指针 可以使用enable_shared_from_this
+            // //需要得到this指针的智能指针 可以使用enable_shared_from_this
             if (m != nullptr) { father->kids.push_back(shared_from_this()); }
             if (f != nullptr) { mother->kids.push_back(shared_from_this()); }
+            // 下面是错误的 跟拿原始指针给两个shared_ptr赋值一样 会重复析构导致崩溃 智能指针是指针的引用计数 不要把原始指针重复赋值
+            // if (m != nullptr) { father->kids.push_back(shared_ptr<Person>(this)); }
+            // if (f != nullptr) { mother->kids.push_back(shared_ptr<Person>(this)); }
         }
 
       private:
@@ -84,10 +88,16 @@ void HowToGetSharedPtrFromThis()
     shared_ptr<Person> mom(new Person("mom"));
     shared_ptr<Person> dad(new Person("dad"));
     shared_ptr<Person> kid(new Person("kid"));
+
     kid->setParentsAndTheirKids(mom, dad);
-    cout << typeid(*kid).name() << endl;
+
+    cout << "mom use count: " << mom.use_count() << endl;
+    cout << "dad use count: " << dad.use_count() << endl;
+    cout << "kid use count: " << kid.use_count() << endl;
+
+    
 }
 int main() 
 {
-
+    HowToGetSharedPtrFromThis();
 }
