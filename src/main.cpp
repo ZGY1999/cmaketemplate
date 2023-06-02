@@ -1,4 +1,5 @@
 #include <iostream>
+#include <type_traits>
 #include <unistd.h> // for ftruncate
 #include <memory>
 #include <sys/mman.h>
@@ -31,8 +32,9 @@ shared_ptr<int> getIntSharedMemory(int num)
             close(shmfd);
     }};
 }
-int main() {
-    shared_ptr<int> ism(getIntSharedMemory(100));
+void TestMem()
+{
+   shared_ptr<int> ism(getIntSharedMemory(100));
     for(int i=0;i<100;i++)
     {
         ism.get()[i]=i;
@@ -41,4 +43,16 @@ int main() {
     cout<<ism.use_count()<<endl;
 
     ism.reset();
+}
+void TestSmartPointerWrongWayToUse()
+{
+    //use_count为1 会多次释放同一对象 导致程序崩溃 要共享应该是智能指针赋值
+    int *p = new int;
+    shared_ptr<int> sp1(p);
+    shared_ptr<int> sp2(p);
+    cout<<sp1.use_count()<<endl;
+    cout<<sp2.use_count()<<endl;
+}
+int main() {
+
 }
